@@ -172,7 +172,7 @@ namespace PolicyManager.DataAccess.Repositories
                 {
                     var documentCollection = new DocumentCollection { Id = collectionId };
                     documentCollection.PartitionKey.Paths.Add(partitionKeyPath);
-                    await documentClient.CreateDocumentCollectionAsync(UriFactory.CreateDatabaseUri(databaseId), documentCollection, new RequestOptions { OfferThroughput = 50000 });
+                    await documentClient.CreateDocumentCollectionAsync(UriFactory.CreateDatabaseUri(databaseId), documentCollection, new RequestOptions { OfferThroughput = 1000 });
                 }
                 else
                 {

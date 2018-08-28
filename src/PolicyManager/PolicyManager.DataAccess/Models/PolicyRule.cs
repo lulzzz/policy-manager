@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using PolicyManager.DataAccess.Attributes;
+using PolicyManager.DataAccess.Extensions;
 using System;
-using System.Linq;
 
 namespace PolicyManager.DataAccess.Models
 {
@@ -14,7 +14,7 @@ namespace PolicyManager.DataAccess.Models
         [JsonProperty("partition")]
         public string Partition
         {
-            get { return CreatedBy?.Split('@').FirstOrDefault(); }
+            get { return Category.ToPolicyRulePartitionKey(); }
         }
 
         [JsonProperty("createdBy")]
@@ -28,6 +28,9 @@ namespace PolicyManager.DataAccess.Models
 
         [JsonProperty("modifiedDate")]
         public DateTime ModifiedDate { get; set; }
+
+        [JsonProperty("category")]
+        public string Category { get; set; }
 
         [JsonProperty("displayName")]
         public string DisplayName { get; set; }

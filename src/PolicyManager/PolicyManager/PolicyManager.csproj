@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PolicyManager.DataAccess\PolicyManager.DataAccess.csproj" />
+    <ProjectReference Include="..\PolicyManager.Lexer\PolicyManager.Lexer.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

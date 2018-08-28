@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 using PolicyManager.DataAccess.Attributes;
+using PolicyManager.DataAccess.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PolicyManager.DataAccess.Models
 {
@@ -15,7 +15,7 @@ namespace PolicyManager.DataAccess.Models
         [JsonProperty("partition")]
         public string Partition
         {
-            get { return UserPrincipalName?.Split('@').LastOrDefault(); }
+            get { return UserPrincipalName.ToUserPolicyPartitionKey(); }
         }
 
         [JsonProperty("userPrincipalName")]

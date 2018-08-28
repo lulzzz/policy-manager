@@ -3,6 +3,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using PolicyManager.DataAccess;
+using PolicyManager.DataAccess.Extensions;
 using PolicyManager.DataAccess.Models;
 using PolicyManager.DataAccess.Repositories;
 using PolicyManager.Extensions;
@@ -26,8 +27,9 @@ namespace PolicyManager
             var userPrincipalName = claimsPrincipal.FetchPropertyValue("preferred_username");
 
             var queryString = req.RequestUri.ParseQueryString();
-            var partition = Convert.ToString(queryString["partition"]);
+            var category = Convert.ToString(queryString["category"]);
             var id = Convert.ToString(queryString["id"]);
+            var partition = category.ToPolicyRulePartitionKey();
 
             var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<string, PolicyRule>>();
             await dataRepository.DeleteItemAsync(partition, id);

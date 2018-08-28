@@ -18,9 +18,13 @@ namespace PolicyManager.DataAccess.Repositories
     {
         Task InitializeDatabaseAsync(string partitionKeyPath);
 
+        Task<IEnumerable<PartitionItem>> FetchPartitionKeys();
+
         Task<TModel> FetchItemAsync(TKey partitionKey, string id);
 
         Task<IEnumerable<TModel>> FetchItemsAsync(TKey partitionKey);
+
+        Task<TModel> FindItemAsync(TKey partitionKey, Expression<Func<TModel, bool>> predicate);
 
         Task<IEnumerable<TModel>> FindItemsAsync(TKey partitionKey, Expression<Func<TModel, bool>> predicate);
 
@@ -61,6 +65,20 @@ namespace PolicyManager.DataAccess.Repositories
             await CreateCollectionIfNotExistsAsync(partitionKeyPath, DatabaseId, CollectionId);
         }
 
+        public async Task<IEnumerable<PartitionItem>> FetchPartitionKeys()
+        {
+            var documentQuery = documentClient.CreateDocumentQuery<PartitionItem>(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId), "select distinct c.partition from c", new FeedOptions() { EnableCrossPartitionQuery = true })
+                .AsDocumentQuery();
+
+            var results = new List<PartitionItem>();
+            while (documentQuery.HasMoreResults)
+            {
+                results.AddRange(await documentQuery.ExecuteNextAsync<PartitionItem>());
+            }
+
+            return results;
+        }
+
         public async Task<TModel> FetchItemAsync(TKey partitionKey, string id)
         {
             var documentUri = UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id);
@@ -81,6 +99,22 @@ namespace PolicyManager.DataAccess.Repositories
 
             return results;
         }
+
+        public async Task<TModel> FindItemAsync(TKey partitionKey, Expression<Func<TModel, bool>> predicate)
+        {
+            var documentQuery = documentClient.CreateDocumentQuery<TModel>(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId), BuildFeedOptions(partitionKey, -1))
+                .Where(predicate)
+                .AsDocumentQuery();
+
+            var results = new List<TModel>();
+            while (documentQuery.HasMoreResults)
+            {
+                results.AddRange(await documentQuery.ExecuteNextAsync<TModel>());
+            }
+
+            return results.FirstOrDefault();
+        }
+
 
         public async Task<IEnumerable<TModel>> FindItemsAsync(TKey partitionKey, Expression<Func<TModel, bool>> predicate)
         {

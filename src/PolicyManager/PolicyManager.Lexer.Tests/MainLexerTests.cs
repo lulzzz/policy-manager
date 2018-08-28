@@ -15,9 +15,9 @@ namespace PolicyManager.Lexer.Tests
             var configuration = @"if (userName == ""juswen@microsoft.com"") { return ""allow""; } else { return ""deny""; }";
 
             var lexerProvider = new LexerProvider();
-            var policyVisitorResult = lexerProvider.RunLexer(initialState, configuration);
+            var returnValue = lexerProvider.RunLexer(initialState, configuration);
 
-            Assert.Equal("allow", policyVisitorResult.StringResult);
+            Assert.Equal("allow", returnValue.ToString());
         }
 
         [Fact]
@@ -30,9 +30,9 @@ namespace PolicyManager.Lexer.Tests
             var configuration = @"if (userName != ""juswen@microsoft.com"") { return ""allow""; } else { return ""deny""; }";
 
             var lexerProvider = new LexerProvider();
-            var policyVisitorResult = lexerProvider.RunLexer(initialState, configuration);
+            var returnValue = lexerProvider.RunLexer(initialState, configuration);
 
-            Assert.Equal("deny", policyVisitorResult.StringResult);
+            Assert.Equal("deny", returnValue.ToString());
         }
     }
 }

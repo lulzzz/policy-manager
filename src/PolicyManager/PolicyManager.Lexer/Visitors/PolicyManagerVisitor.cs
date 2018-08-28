@@ -7,21 +7,21 @@ using System.Collections.Generic;
 namespace PolicyManager.Lexer.Visitors
 {
     public class PolicyManagerVisitor
-        : PolicyManagerBaseVisitor<PolicyVisitorResult>
+        : PolicyManagerBaseVisitor<ReturnValue>
     {
         private readonly IDictionary<string, string> initialState = new Dictionary<string, string>();
-        private IDictionary<string, PolicyVisitorResult> memory = new Dictionary<string, PolicyVisitorResult>();
+        private IDictionary<string, ReturnValue> memory = new Dictionary<string, ReturnValue>();
 
         public PolicyManagerVisitor(Dictionary<string, string> state)
         {
             initialState = state;
             foreach (var kvp in initialState)
             {
-                memory.Add(kvp.Key, new PolicyVisitorResult() { StringResult = kvp.Value });
+                memory.Add(kvp.Key, new ReturnValue(kvp.Value));
             }
         }
 
-        public override PolicyVisitorResult VisitTerminal([NotNull] ITerminalNode node)
+        public override ReturnValue VisitTerminal([NotNull] ITerminalNode node)
         {
             if (memory.ContainsKey("return"))
             {
@@ -31,7 +31,7 @@ namespace PolicyManager.Lexer.Visitors
             return base.VisitTerminal(node);
         }
 
-        public override PolicyVisitorResult VisitAssignment([NotNull] PolicyManagerParser.AssignmentContext context)
+        public override ReturnValue VisitAssignment([NotNull] PolicyManagerParser.AssignmentContext context)
         {
             var id = context.ID().GetText();
             var value = Visit(context.expr());
@@ -47,7 +47,7 @@ namespace PolicyManager.Lexer.Visitors
             return memory[id];
         }
 
-        public override PolicyVisitorResult VisitIdAtom([NotNull] PolicyManagerParser.IdAtomContext context)
+        public override ReturnValue VisitIdAtom([NotNull] PolicyManagerParser.IdAtomContext context)
         {
             var id = context.GetText();
             if (memory.ContainsKey(id))
@@ -58,114 +58,171 @@ namespace PolicyManager.Lexer.Visitors
             throw new InvalidOperationException($"No such variable: {id}");
         }
 
-        public override PolicyVisitorResult VisitStringAtom([NotNull] PolicyManagerParser.StringAtomContext context)
+        public override ReturnValue VisitStringAtom([NotNull] PolicyManagerParser.StringAtomContext context)
         {
             var str = context.GetText();
             str = str.Replace("\"", string.Empty);
-            return new PolicyVisitorResult() { StringResult = str };
+            return new ReturnValue(str);
         }
 
-        public override PolicyVisitorResult VisitNumberAtom([NotNull] PolicyManagerParser.NumberAtomContext context)
+        public override ReturnValue VisitNumberAtom([NotNull] PolicyManagerParser.NumberAtomContext context)
         {
             var str = context.GetText();
             var value = double.Parse(str);
-            return new PolicyVisitorResult() { NumberResult = value };
+            return new ReturnValue(value);
         }
 
-        public override PolicyVisitorResult VisitBooleanAtom([NotNull] PolicyManagerParser.BooleanAtomContext context)
+        public override ReturnValue VisitBooleanAtom([NotNull] PolicyManagerParser.BooleanAtomContext context)
         {
             var str = context.GetText();
             var value = bool.Parse(str);
-            return new PolicyVisitorResult() { BooleanResult = value };
+            return new ReturnValue(value);
         }
 
-        public override PolicyVisitorResult VisitNilAtom([NotNull] PolicyManagerParser.NilAtomContext context)
+        public override ReturnValue VisitNilAtom([NotNull] PolicyManagerParser.NilAtomContext context)
         {
-            return new PolicyVisitorResult();
+            return default(ReturnValue);
         }
 
-        public override PolicyVisitorResult VisitParExpr([NotNull] PolicyManagerParser.ParExprContext context)
+        public override ReturnValue VisitParExpr([NotNull] PolicyManagerParser.ParExprContext context)
         {
             return Visit(context.expr());
         }
 
-        public override PolicyVisitorResult VisitPowExpr([NotNull] PolicyManagerParser.PowExprContext context)
+        public override ReturnValue VisitPowExpr([NotNull] PolicyManagerParser.PowExprContext context)
         {
             var left = Visit(context.expr(0));
             var right = Visit(context.expr(1));
-            return new PolicyVisitorResult() { NumberResult = Math.Pow(left.NumberResult.Value, right.NumberResult.Value) };
+            return new ReturnValue(Math.Pow(left.ToDouble(), right.ToDouble()));
         }
 
-        public override PolicyVisitorResult VisitUnaryMinusExpr([NotNull] PolicyManagerParser.UnaryMinusExprContext context)
+        public override ReturnValue VisitUnaryMinusExpr([NotNull] PolicyManagerParser.UnaryMinusExprContext context)
         {
             var value = Visit(context.expr());
-            return new PolicyVisitorResult() { NumberResult = -1 * value.NumberResult };
+            return new ReturnValue(value.ToDouble());
         }
 
-        public override PolicyVisitorResult VisitNotExpr([NotNull] PolicyManagerParser.NotExprContext context)
+        public override ReturnValue VisitNotExpr([NotNull] PolicyManagerParser.NotExprContext context)
         {
             var value = Visit(context.expr());
-            return new PolicyVisitorResult() { BooleanResult = !value.BooleanResult };
+            return new ReturnValue(!value.ToBoolean());
         }
 
-        public override PolicyVisitorResult VisitMultiplicationExpr([NotNull] PolicyManagerParser.MultiplicationExprContext context)
+        public override ReturnValue VisitMultiplicationExpr([NotNull] PolicyManagerParser.MultiplicationExprContext context)
         {
             var left = Visit(context.expr(0));
             var right = Visit(context.expr(1));
 
-            var policyVisitorResult = new PolicyVisitorResult();
+            var returnValue = default(ReturnValue);
             switch (context.op.Type)
             {
-                case PolicyManagerParser.LT:
-                    policyVisitorResult = new PolicyVisitorResult() { BooleanResult = left.NumberResult < right.NumberResult };
+                case PolicyManagerParser.MULT:
+                    returnValue = new ReturnValue(left.ToDouble() * right.ToDouble());
                     break;
 
-                case PolicyManagerParser.LTEQ:
-                    policyVisitorResult = new PolicyVisitorResult() { BooleanResult = left.NumberResult <= right.NumberResult };
+                case PolicyManagerParser.DIV:
+                    returnValue = new ReturnValue(left.ToDouble() / right.ToDouble());
                     break;
 
-                case PolicyManagerParser.GT:
-                    policyVisitorResult = new PolicyVisitorResult() { BooleanResult = left.NumberResult > right.NumberResult };
-                    break;
-
-                case PolicyManagerParser.GTEQ:
-                    policyVisitorResult = new PolicyVisitorResult() { BooleanResult = left.NumberResult >= right.NumberResult };
+                case PolicyManagerParser.MOD:
+                    returnValue = new ReturnValue(left.ToDouble() % right.ToDouble());
                     break;
 
                 default:
                     throw new InvalidOperationException($"Unknown Operator: {PolicyManagerParser.DefaultVocabulary.GetDisplayName(context.op.Type)}");
             }
 
-            return policyVisitorResult;
+            return returnValue;
         }
 
-        public override PolicyVisitorResult VisitEqualityExpr([NotNull] PolicyManagerParser.EqualityExprContext context)
+        public override ReturnValue VisitAdditiveExpr([NotNull] PolicyManagerParser.AdditiveExprContext context)
         {
             var left = Visit(context.expr(0));
             var right = Visit(context.expr(1));
 
-            var policyVisitorResult = new PolicyVisitorResult();
+            var returnValue = default(ReturnValue);
             switch (context.op.Type)
             {
-                case PolicyManagerParser.EQ:
-                    if (left.NumberResult.HasValue && right.NumberResult.HasValue)
+                case PolicyManagerParser.PLUS:
+                    if (left.IsDouble() && right.IsDouble())
                     {
-                        policyVisitorResult = new PolicyVisitorResult() { BooleanResult = Math.Abs(left.NumberResult.Value - right.NumberResult.Value) < 0 };
+                        returnValue = new ReturnValue(left.ToDouble() + right.ToDouble());
                     }
                     else
                     {
-                        policyVisitorResult = new PolicyVisitorResult() { BooleanResult = left.Equals(right) };
+                        returnValue = new ReturnValue(left.ToString() + right.ToString());
+                    }
+                    break;
+
+                case PolicyManagerParser.MINUS:
+                    returnValue = new ReturnValue(left.ToDouble() - right.ToDouble());
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Unknown Operator: {PolicyManagerParser.DefaultVocabulary.GetDisplayName(context.op.Type)}");
+            }
+
+            return returnValue;
+        }
+
+        public override ReturnValue VisitRelationalExpr([NotNull] PolicyManagerParser.RelationalExprContext context)
+        {
+            var left = Visit(context.expr(0));
+            var right = Visit(context.expr(1));
+
+            var returnValue = default(ReturnValue);
+            switch (context.op.Type)
+            {
+                case PolicyManagerParser.LT:
+                    returnValue = new ReturnValue(left.ToDouble() < right.ToDouble());
+                    break;
+
+                case PolicyManagerParser.LTEQ:
+                    returnValue = new ReturnValue(left.ToDouble() <= right.ToDouble());
+                    break;
+
+                case PolicyManagerParser.GT:
+                    returnValue = new ReturnValue(left.ToDouble() > right.ToDouble());
+                    break;
+
+                case PolicyManagerParser.GTEQ:
+                    returnValue = new ReturnValue(left.ToDouble() >= right.ToDouble());
+                    break;
+
+                default:
+                    throw new InvalidOperationException($"Unknown Operator: {PolicyManagerParser.DefaultVocabulary.GetDisplayName(context.op.Type)}");
+            }
+
+            return returnValue;
+        }
+
+        public override ReturnValue VisitEqualityExpr([NotNull] PolicyManagerParser.EqualityExprContext context)
+        {
+            var left = Visit(context.expr(0));
+            var right = Visit(context.expr(1));
+
+            var returnValue = default(ReturnValue);
+            switch (context.op.Type)
+            {
+                case PolicyManagerParser.EQ:
+                    if (left.IsDouble() && right.IsDouble())
+                    {
+                        returnValue = new ReturnValue(Math.Abs(left.ToDouble() - right.ToDouble()) < 0);
+                    }
+                    else
+                    {
+                        returnValue = new ReturnValue(left.Equals(right));
                     }
                     break;
 
                 case PolicyManagerParser.NEQ:
-                    if (left.NumberResult.HasValue && right.NumberResult.HasValue)
+                    if (left.IsDouble() && right.IsDouble())
                     {
-                        policyVisitorResult = new PolicyVisitorResult() { BooleanResult = Math.Abs(left.NumberResult.Value - right.NumberResult.Value) >= 0 };
+                        returnValue = new ReturnValue(Math.Abs(left.ToDouble() - right.ToDouble()) >= 0);
                     }
                     else
                     {
-                        policyVisitorResult = new PolicyVisitorResult() { BooleanResult = !left.Equals(right) };
+                        returnValue = new ReturnValue(!left.Equals(right));
                     }
                     break;
 
@@ -173,26 +230,26 @@ namespace PolicyManager.Lexer.Visitors
                     throw new InvalidOperationException($"Unknown Operator: {PolicyManagerParser.DefaultVocabulary.GetDisplayName(context.op.Type)}");
             }
 
-            return policyVisitorResult;
+            return returnValue;
         }
 
-        public override PolicyVisitorResult VisitAndExpr([NotNull] PolicyManagerParser.AndExprContext context)
+        public override ReturnValue VisitAndExpr([NotNull] PolicyManagerParser.AndExprContext context)
         {
             var left = Visit(context.expr(0));
             var right = Visit(context.expr(1));
 
-            return new PolicyVisitorResult() { BooleanResult = left.BooleanResult.Value && right.BooleanResult.Value };
+            return new ReturnValue(left.ToBoolean() && right.ToBoolean());
         }
 
-        public override PolicyVisitorResult VisitOrExpr([NotNull] PolicyManagerParser.OrExprContext context)
+        public override ReturnValue VisitOrExpr([NotNull] PolicyManagerParser.OrExprContext context)
         {
             var left = Visit(context.expr(0));
             var right = Visit(context.expr(1));
 
-            return new PolicyVisitorResult() { BooleanResult = left.BooleanResult.Value || right.BooleanResult.Value };
+            return new ReturnValue(left.ToBoolean() || right.ToBoolean());
         }
 
-        public override PolicyVisitorResult VisitLog([NotNull] PolicyManagerParser.LogContext context)
+        public override ReturnValue VisitLog([NotNull] PolicyManagerParser.LogContext context)
         {
             var value = Visit(context.expr());
             // TODO: switch to ILogger...
@@ -200,7 +257,7 @@ namespace PolicyManager.Lexer.Visitors
             return value;
         }
 
-        public override PolicyVisitorResult VisitIf_stat([NotNull] PolicyManagerParser.If_statContext context)
+        public override ReturnValue VisitIf_stat([NotNull] PolicyManagerParser.If_statContext context)
         {
             var conditions = context.condition_block();
             var evaluatedBlock = false;
@@ -208,7 +265,7 @@ namespace PolicyManager.Lexer.Visitors
             foreach (var condition in conditions)
             {
                 var evaluated = Visit(condition.expr());
-                if (evaluated.BooleanResult.Value)
+                if (evaluated.IsBoolean() && evaluated.ToBoolean())
                 {
                     evaluatedBlock = true;
                     Visit(condition.stat_block());
@@ -221,21 +278,21 @@ namespace PolicyManager.Lexer.Visitors
                 Visit(context.stat_block());
             }
 
-            return default(PolicyVisitorResult);
+            return default(ReturnValue);
         }
 
-        public override PolicyVisitorResult VisitWhile_stat([NotNull] PolicyManagerParser.While_statContext context)
+        public override ReturnValue VisitWhile_stat([NotNull] PolicyManagerParser.While_statContext context)
         {
             var value = Visit(context.expr());
 
-            while (value.BooleanResult.Value)
+            while (value.ToBoolean())
             {
                 Visit(context.stat_block());
 
                 value = Visit(context.expr());
             }
 
-            return default(PolicyVisitorResult);
+            return default(ReturnValue);
         }
     }
 }

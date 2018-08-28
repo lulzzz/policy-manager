@@ -8,6 +8,7 @@ using PolicyManager.DataAccess.Models;
 using PolicyManager.DataAccess.Repositories;
 using PolicyManager.Extensions;
 using PolicyManager.Helpers;
+using PolicyManager.Lexer;
 using PolicyManager.Results;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,17 @@ namespace PolicyManager
             }
 
             var validateResults = new List<ValidateResult>();
+            foreach (var policyRule in policyRules)
+            {
+                var initialState = new Dictionary<string, string>
+                {
+                    { "userName", userPrincipalName }
+                };
+
+                var lexerProvider = new LexerProvider();
+                var returnValue = lexerProvider.RunLexer(initialState, policyRule.Rule);
+                validateResults.Add(new ValidateResult() { Id = policyRule.Id, Category = policyRule.Category, PolicyName = policyRule.DisplayName, Description = policyRule.Description, Result = returnValue.ToString() });
+            }
 
             return new OkObjectResult(validateResults);
         }

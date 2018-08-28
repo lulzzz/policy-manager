@@ -58,7 +58,7 @@ POST <http://localhost:7071/api/AddPolicy>
     "category": "Finance",
     "displayName": "Test Policy 01",
     "description": "This is a test policy rule",
-    "rule": "if (userName == ""juswen@microsoft.com"") { return ""allow""; } else { return ""deny""; }"
+    "rule": "if (userName == \"juswen@microsoft.com\") { return \"allow\"; } else { return \"deny\"; }"
 }
 ```
 
@@ -122,7 +122,17 @@ Validate
 
 GET <http://localhost:7071/api/Validate?context=/user/profile>
 
-Still WIP
+``` json
+[
+	{
+		"id": "9f5bcd97-fa61-4aee-99bf-38c2c3875fd7",
+		"category": "Finance",
+		"policyName": "Test Policy 01",
+		"description": "This is a test policy rule",
+		"result": "allow"
+	}
+]
+```
 
 ## Using the Service without a UI
 

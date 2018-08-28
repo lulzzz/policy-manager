@@ -7,7 +7,7 @@ namespace PolicyManager.Lexer
 {
     public class LexerProvider
     {
-        public PolicyVisitorResult RunLexer(Dictionary<string, string> initialState, string configuration)
+        public ReturnValue RunLexer(Dictionary<string, string> initialState, string configuration)
         {
             var antlrInputStream = new AntlrInputStream(configuration);
             var policyManagerLexer = new PolicyManagerLexer(antlrInputStream);

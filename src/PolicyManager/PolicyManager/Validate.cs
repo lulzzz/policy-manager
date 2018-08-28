@@ -53,6 +53,7 @@ namespace PolicyManager
             {
                 var initialState = new Dictionary<string, string>
                 {
+                    { "context", context },
                     { "userName", userPrincipalName }
                 };
 

@@ -14,28 +14,31 @@ using System.Threading.Tasks;
 
 namespace PolicyManager
 {
-    public static class AddPolicy
+    public static class AddPolicyToUser
     {
-        [FunctionName("AddPolicy")]
+        [FunctionName("AddPolicyToUser")]
         public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, ILogger log)
         {
-            log.LogInformation("Add Policy Invoked.");
+            log.LogInformation("Add Policy to User Invoked.");
 
             var claimsPrincipal = await AuthHelper.ValidateTokenAsync(req?.Headers?.Authorization, log);
             if (claimsPrincipal == null) return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             var userPrincipalName = claimsPrincipal.FetchPropertyValue("preferred_username");
+            var userObjectId = claimsPrincipal.FetchPropertyValue("oid");
 
-            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<string, PolicyRule>>();
+            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<string, UserPolicy>>();
 
-            var policyRule = await req.Content.ReadAsAsync<PolicyRule>();
-            policyRule.CreatedBy = userPrincipalName;
-            policyRule.CreatedDate = DateTime.UtcNow;
-            policyRule.LastModifiedBy = userPrincipalName;
-            policyRule.ModifiedDate = DateTime.UtcNow;
+            var userPolicy = await req.Content.ReadAsAsync<UserPolicy>();
+            userPolicy.UserPrincipalName = userPrincipalName;
+            userPolicy.UserObjectId = userObjectId;
+            userPolicy.CreatedBy = userPrincipalName;
+            userPolicy.CreatedDate = DateTime.UtcNow;
+            userPolicy.LastModifiedBy = userPrincipalName;
+            userPolicy.ModifiedDate = DateTime.UtcNow;
 
-            var resultPolicyRule = await dataRepository.CreateItemAsync(policyRule.Partition, policyRule);
+            var resultUserPolicy = await dataRepository.CreateItemAsync(userPolicy.Partition, userPolicy);
 
-            return new OkObjectResult(resultPolicyRule);
+            return new OkObjectResult(resultUserPolicy);
         }
     }
 }

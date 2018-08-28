@@ -14,26 +14,30 @@ using System.Threading.Tasks;
 
 namespace PolicyManager
 {
-    public static class AddPolicy
+    public static class UpdatePolicy
     {
-        [FunctionName("AddPolicy")]
-        public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, ILogger log)
+        [FunctionName("UpdatePolicy")]
+        public static async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, ILogger log)
         {
-            log.LogInformation("Add Policy Invoked.");
+            log.LogInformation("Update Policy Invoked.");
 
             var claimsPrincipal = await AuthHelper.ValidateTokenAsync(req?.Headers?.Authorization, log);
             if (claimsPrincipal == null) return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             var userPrincipalName = claimsPrincipal.FetchPropertyValue("preferred_username");
 
+            var queryString = req.RequestUri.ParseQueryString();
+            var partition = Convert.ToString(queryString["partition"]);
+            var id = Convert.ToString(queryString["id"]);
+
             var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<string, PolicyRule>>();
+            var dataPolicyRule = await dataRepository.FetchItemAsync(partition, id);
 
             var policyRule = await req.Content.ReadAsAsync<PolicyRule>();
-            policyRule.CreatedBy = userPrincipalName;
-            policyRule.CreatedDate = DateTime.UtcNow;
-            policyRule.LastModifiedBy = userPrincipalName;
-            policyRule.ModifiedDate = DateTime.UtcNow;
+            dataPolicyRule.LastModifiedBy = userPrincipalName;
+            dataPolicyRule.ModifiedDate = DateTime.UtcNow;
+            dataPolicyRule.Rule = policyRule.Rule;
 
-            var resultPolicyRule = await dataRepository.CreateItemAsync(policyRule.Partition, policyRule);
+            var resultPolicyRule = await dataRepository.UpdateItemAsync(dataPolicyRule.Partition, dataPolicyRule.Id, dataPolicyRule);
 
             return new OkObjectResult(resultPolicyRule);
         }

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolicyManager", "PolicyManager\PolicyManager.csproj", "{2F33FB20-D574-4C6D-9888-E734CE8D9D1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolicyManager", "PolicyManager\PolicyManager.csproj", "{2F33FB20-D574-4C6D-9888-E734CE8D9D1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolicyManager.Setup", "PolicyManager.Setup\PolicyManager.Setup.csproj", "{602E1304-2E42-4E82-9047-C4514E15F653}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolicyManager.Setup", "PolicyManager.Setup\PolicyManager.Setup.csproj", "{602E1304-2E42-4E82-9047-C4514E15F653}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolicyManager.DataAccess", "PolicyManager.DataAccess\PolicyManager.DataAccess.csproj", "{E1BC67B7-46FB-4960-9139-C4AAC27BE11E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolicyManager.DataAccess", "PolicyManager.DataAccess\PolicyManager.DataAccess.csproj", "{E1BC67B7-46FB-4960-9139-C4AAC27BE11E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

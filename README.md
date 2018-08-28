@@ -51,7 +51,7 @@ All requests below require a bearer token that is signed into your application c
 
 Add Policy
 
-POST http://localhost:7071/api/AddPolicy
+POST <http://localhost:7071/api/AddPolicy>
 
 ``` json
 {
@@ -64,7 +64,7 @@ POST http://localhost:7071/api/AddPolicy
 
 Update User Policies
 
-POST http://localhost:7071/api/UpdateUserPolicies
+POST <http://localhost:7071/api/UpdateUserPolicies>
 
 ``` json
 {
@@ -73,6 +73,56 @@ POST http://localhost:7071/api/UpdateUserPolicies
     ]
 }
 ```
+
+Fetch Policies
+
+GET <http://localhost:7071/api/FetchPolicies?category=Finance>
+
+Results will look like:
+
+``` json
+[
+    {
+        "id": "fd84c5f7-f2de-4b3c-a923-ad703178b27a",
+        "partition": "FINANCE",
+        "createdBy": "juswen@microsoft.com",
+        "createdDate": "2018-08-28T16:58:43.228285Z",
+        "lastModifiedBy": "juswen@microsoft.com",
+        "modifiedDate": "2018-08-28T16:58:43.2283878Z",
+        "category": "Finance",
+        "displayName": "Test Policy 01",
+        "description": "This is a test policy rule",
+        "rule": "if userName equals 'juswen@microsoft.com' then allow else deny endif"
+    }
+]
+```
+
+Fetch Policy
+
+GET <http://localhost:7071/api/FetchPolicy?category=Finance&id=fd84c5f7-f2de-4b3c-a923-ad703178b27a>
+
+Results will look like:
+
+``` json
+{
+    "id": "fd84c5f7-f2de-4b3c-a923-ad703178b27a",
+    "partition": "FINANCE",
+    "createdBy": "juswen@microsoft.com",
+    "createdDate": "2018-08-28T16:58:43.228285Z",
+    "lastModifiedBy": "juswen@microsoft.com",
+    "modifiedDate": "2018-08-28T16:58:43.2283878Z",
+    "category": "Finance",
+    "displayName": "Test Policy 01",
+    "description": "This is a test policy rule",
+    "rule": "if userName equals 'juswen@microsoft.com' then allow else deny endif"
+}
+```
+
+Validate
+
+GET <http://localhost:7071/api/Validate?context=/user/profile>
+
+Still WIP
 
 ## Using the Service without a UI
 
@@ -88,7 +138,7 @@ For Get Code, configure it like the screens below:
 
 ![Address](docs/get-code-address.png)
 
-> Set the address bar to an address that has the tenant id like https://login.microsoftonline.com/[tenant-id]/oauth2/v2.0/authorize
+> Set the address bar to an address that has the tenant id like <https://login.microsoftonline.com/[tenant-id]/oauth2/v2.0/authorize>
 
 Then under the Query tab
 

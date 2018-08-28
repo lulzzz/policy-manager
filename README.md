@@ -92,7 +92,7 @@ Results will look like:
         "category": "Finance",
         "displayName": "Test Policy 01",
         "description": "This is a test policy rule",
-        "rule": "if userName equals 'juswen@microsoft.com' then allow else deny endif"
+        "rule": "if (userName == ""juswen@microsoft.com"") { return ""allow""; } else { return ""deny""; }"
     }
 ]
 ```
@@ -114,7 +114,7 @@ Results will look like:
     "category": "Finance",
     "displayName": "Test Policy 01",
     "description": "This is a test policy rule",
-    "rule": "if userName equals 'juswen@microsoft.com' then allow else deny endif"
+    "rule": "if (userName == ""juswen@microsoft.com"") { return ""allow""; } else { return ""deny""; }"
 }
 ```
 

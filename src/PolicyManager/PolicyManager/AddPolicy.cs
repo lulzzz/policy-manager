@@ -2,7 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using PolicyManager.DataAccess;
 using PolicyManager.DataAccess.Models;
+using PolicyManager.DataAccess.Repositories;
+using PolicyManager.Extensions;
+using PolicyManager.Helpers;
+using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -15,9 +21,21 @@ namespace PolicyManager
         {
             log.LogInformation("Add Policy Invoked...");
 
-            var policyRule = await req.Content.ReadAsAsync<PolicyRule>();
+            var claimsPrincipal = await AuthHelper.ValidateTokenAsync(req?.Headers?.Authorization, log);
+            if (claimsPrincipal == null) return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            var userPrincipalName = claimsPrincipal.FetchPropertyValue("preferred_username");
 
-            return new OkObjectResult(policyRule);
+            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<string, PolicyRule>>();
+
+            var policyRule = await req.Content.ReadAsAsync<PolicyRule>();
+            policyRule.CreatedBy = userPrincipalName;
+            policyRule.CreatedDate = DateTime.UtcNow;
+            policyRule.LastModifiedBy = userPrincipalName;
+            policyRule.ModifiedDate = DateTime.UtcNow;
+
+            var resultPolicyRule = await dataRepository.CreateItemAsync(policyRule.Partition, policyRule);
+
+            return new OkObjectResult(resultPolicyRule);
         }
     }
 }

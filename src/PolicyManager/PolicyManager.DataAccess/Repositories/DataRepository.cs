@@ -2,6 +2,8 @@
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using Newtonsoft.Json;
+using PolicyManager.DataAccess.Attributes;
+using PolicyManager.DataAccess.Extensions;
 using PolicyManager.DataAccess.Models;
 using System;
 using System.Collections.Generic;
@@ -48,7 +50,7 @@ namespace PolicyManager.DataAccess.Repositories
             };
 
             DatabaseId = documentSettings.DatabaseId;
-            CollectionId = nameof(TModel);
+            CollectionId = typeof(TModel).GetAttributeValue<DocumentNameAttribute, string>(a => a.Name);
 
             documentClient = new DocumentClient(documentSettings.DocumentEndpoint, documentSettings.DocumentKey, connectionPolicy);
         }

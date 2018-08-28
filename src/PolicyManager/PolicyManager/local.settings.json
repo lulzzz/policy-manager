@@ -4,6 +4,8 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "Audience": "ea708f75-27b6-409b-824e-29a249d0de53",
+    "Issuer": "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47/v2.0",
     "DocumentEndpoint": "https://localhost:8081/",
     "DocumentKey": "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
     "DatabaseId": "PolicyManager"

@@ -1,12 +1,13 @@
 ﻿using Newtonsoft.Json;
 using PolicyManager.DataAccess.Attributes;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PolicyManager.DataAccess.Models
 {
-    [DocumentName("Policies")]
-    public class PolicyRule
+    [DocumentName("UserPolicies")]
+    public class UserPolicy
     {
         [JsonProperty("id")]
         public string Id { get; set; }
@@ -14,8 +15,11 @@ namespace PolicyManager.DataAccess.Models
         [JsonProperty("partition")]
         public string Partition
         {
-            get { return CreatedBy?.Split('@').FirstOrDefault(); }
+            get { return UserPrincipalName?.Split('@').LastOrDefault(); }
         }
+
+        [JsonProperty("userPrincipalName")]
+        public string UserPrincipalName { get; set; }
 
         [JsonProperty("createdBy")]
         public string CreatedBy { get; set; }
@@ -29,13 +33,10 @@ namespace PolicyManager.DataAccess.Models
         [JsonProperty("modifiedDate")]
         public DateTime ModifiedDate { get; set; }
 
-        [JsonProperty("displayName")]
-        public string DisplayName { get; set; }
+        [JsonProperty("userObjectId")]
+        public string UserObjectId { get; set; }
 
-        [JsonProperty("description")]
-        public string Description { get; set; }
-
-        [JsonProperty("rule")]
-        public string Rule { get; set; }
+        [JsonProperty("policyIds")]
+        public IEnumerable<string> PolicyIds { get; set; }
     }
 }

@@ -12,10 +12,13 @@ namespace PolicyManager.DataAccess
 
         static ServiceLocator()
         {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddRepositoryToServiceCollection<PolicyRule>();
-            serviceCollection.AddRepositoryToServiceCollection<UserPolicy>();
-            serviceProvider = serviceCollection.BuildServiceProvider();
+            if (serviceProvider == null)
+            {
+                var serviceCollection = new ServiceCollection();
+                serviceCollection.AddRepositoryToServiceCollection<PolicyRule>();
+                serviceCollection.AddRepositoryToServiceCollection<UserPolicy>();
+                serviceProvider = serviceCollection.BuildServiceProvider();
+            }
         }
 
         public static T GetRequiredService<T>()

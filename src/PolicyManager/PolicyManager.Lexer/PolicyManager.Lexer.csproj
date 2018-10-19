@@ -5,14 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Antlr4" Version="4.6.5-rc002" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Antlr4 Include="Grammar\PolicyManager.g4">
-      <Generator>MSBuild:Compile</Generator>
-      <CustomToolNamespace>PolicyManager.Lexer</CustomToolNamespace>
-    </Antlr4>
+    <PackageReference Include="Antlr4" Version="4.6.6-rc001" />
   </ItemGroup>
 
 </Project>

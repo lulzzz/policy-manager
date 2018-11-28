@@ -5,45 +5,11 @@ A policy manager using Azure Functions and Cosmos DB to manage contextual based 
 ## Getting Started
 
 1. Clone the repository
-2. Run the Cosmos DB emulator [download](https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator)
+2. Run the [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator)
 3. Set the PolicyManager.Setup as the startup project
 4. Run the application
 5. Set the PolicyManager project as the startup project
 6. Hit F5 and see the section below labelled "Example Api Usage"
-
-## Creating an Application using Convergent Applications
-
-First navigate to <https://apps.dev.microsoft.com/>
-
-Select "Add an App"
-
-![Add an App](docs/converged-apps-add-app.png)
-
-Enter an "Application Name"
-
-![Application Name](docs/converged-apps-application-name.png)
-
-Click on "Create"
-
-Note the "Application Id"
-
-![Application Id](docs/converged-apps-application-id.png)
-
-Then click on "Add Platform" and select both "Web" and "Web Api"
-
-![Web and Api](docs/converged-apps-web-and-api.png)
-
-In the Redirect URLs, enter something fake like <https://localhost/>
-
-Note the "Application ID Uri" (for below)
-
-![App Id](docs/converged-apps-app-id.png)
-
-This is mainly because your "scopes" below are going to end up being api://47072c49-8001-4108-9ce0-e02ad439bff2/access_as_user
-
-Create a secret - no screenshots here, just go under "Application Secrets" and "Generate New Password", then be sure to save it somewhere.
-
-Lastly, click on "Save" on the bottom.
 
 ## Example Api Usage
 
@@ -55,10 +21,10 @@ POST <http://localhost:7071/api/AddPolicy>
 
 ``` json
 {
-    "category": "Finance",
-    "displayName": "Test Policy 01",
-    "description": "This is a test policy rule",
-    "rule": "if (userName == \"juswen@microsoft.com\") { return \"allow\"; } else { return \"deny\"; }"
+	"category": "Finance",
+	"displayName": "Test Policy 01",
+	"description": "This is a test policy rule",
+	"rule": "if (userName == \"juswen@microsoft.com\") { return \"allow\"; } else { return \"deny\"; }"
 }
 ```
 
@@ -68,9 +34,8 @@ POST <http://localhost:7071/api/UpdateUserPolicies>
 
 ``` json
 {
-    "policyIds": [
-        "fd84c5f7-f2de-4b3c-a923-ad703178b27a"
-    ]
+	"policyId": "b7751cc7-8219-4a8a-9b82-11e02ff49330",
+	"policyCategory": "Finance"
 }
 ```
 
@@ -82,18 +47,18 @@ Results will look like:
 
 ``` json
 [
-    {
-        "id": "fd84c5f7-f2de-4b3c-a923-ad703178b27a",
-        "partition": "FINANCE",
-        "createdBy": "juswen@microsoft.com",
-        "createdDate": "2018-08-28T16:58:43.228285Z",
-        "lastModifiedBy": "juswen@microsoft.com",
-        "modifiedDate": "2018-08-28T16:58:43.2283878Z",
-        "category": "Finance",
-        "displayName": "Test Policy 01",
-        "description": "This is a test policy rule",
-        "rule": "if (userName == ""juswen@microsoft.com"") { return ""allow""; } else { return ""deny""; }"
-    }
+	{
+		"id": "fd84c5f7-f2de-4b3c-a923-ad703178b27a",
+		"partition": "FINANCE",
+		"createdBy": "juswen@microsoft.com",
+		"createdDate": "2018-08-28T16:58:43.228285Z",
+		"lastModifiedBy": "juswen@microsoft.com",
+		"modifiedDate": "2018-08-28T16:58:43.2283878Z",
+		"category": "Finance",
+		"displayName": "Test Policy 01",
+		"description": "This is a test policy rule",
+		"rule": "if (userName == ""juswen@microsoft.com"") { return ""allow""; } else { return ""deny""; }"
+	}
 ]
 ```
 
@@ -105,16 +70,16 @@ Results will look like:
 
 ``` json
 {
-    "id": "fd84c5f7-f2de-4b3c-a923-ad703178b27a",
-    "partition": "FINANCE",
-    "createdBy": "juswen@microsoft.com",
-    "createdDate": "2018-08-28T16:58:43.228285Z",
-    "lastModifiedBy": "juswen@microsoft.com",
-    "modifiedDate": "2018-08-28T16:58:43.2283878Z",
-    "category": "Finance",
-    "displayName": "Test Policy 01",
-    "description": "This is a test policy rule",
-    "rule": "if (userName == ""juswen@microsoft.com"") { return ""allow""; } else { return ""deny""; }"
+	"id": "fd84c5f7-f2de-4b3c-a923-ad703178b27a",
+	"partition": "FINANCE",
+	"createdBy": "juswen@microsoft.com",
+	"createdDate": "2018-08-28T16:58:43.228285Z",
+	"lastModifiedBy": "juswen@microsoft.com",
+	"modifiedDate": "2018-08-28T16:58:43.2283878Z",
+	"category": "Finance",
+	"displayName": "Test Policy 01",
+	"description": "This is a test policy rule",
+	"rule": "if (userName == ""juswen@microsoft.com"") { return ""allow""; } else { return ""deny""; }"
 }
 ```
 
@@ -124,50 +89,83 @@ GET <http://localhost:7071/api/Validate?context=/user/profile>
 
 ``` json
 [
-    {
-        "id": "9f5bcd97-fa61-4aee-99bf-38c2c3875fd7",
-        "category": "Finance",
-        "policyName": "Test Policy 01",
-        "description": "This is a test policy rule",
-        "result": "allow"
-    }
+	{
+		"id": "9f5bcd97-fa61-4aee-99bf-38c2c3875fd7",
+		"category": "Finance",
+		"policyName": "Test Policy 01",
+		"description": "This is a test policy rule",
+		"result": "allow"
+	}
 ]
 ```
 
 ## Using the Service without a UI
 
-Use something like [Insomnia](https://insomnia.rest/download/)
+Use something like [Insomnia](https://insomnia.rest/download/).
 
-Create a new application under the [dev center](https://apps.dev.microsoft.com/)
+Create a new application under the [application registration portal](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredAppsPreview).
 
-Create a new Folder
+First create a new application registration.
 
-![New Folder](docs/folder.png)
+![New registration](docs/aad-app-registration-001.png)
 
-For Get Code, configure it like the screens below:
+Then enter a name and use something like https://localhost as the Redirect URI.
 
-![Address](docs/get-code-address.png)
+![App registrations (Preview)](docs/aad-app-registration-002.png)
 
-> Set the address bar to an address that has the tenant id like <https://login.microsoftonline.com/[tenant-id]/oauth2/v2.0/authorize>
+Then select "Register"
 
-Then under the Query tab
+Inside the "Authentication" tab on the next screen, be sure to check all of the suggested Redirect URIs too.
 
-![Query](docs/get-code-query.png)
+![Authentication](docs/aad-app-registration-003.png)
 
-> In this example, we have the api://{guid}/access_as_user setup as the scope. This is a custom scope built for my app id.
+Under the "Expose an API" screen, we need to configure a custom scope (I use Policy.Read.All as an example).
 
-Then we take the address under "URL PREVIEW" and copy and paste it into a browser, then login and consent to app consent.
+![Expose an API](docs/aad-app-registration-004.png)
 
-For the Get Token, configure it like the screens below:
+Finally under API permissions, we need to add it to our permitted scopes. After doing that select "Grant admin consent for..."
 
-![Address](docs/get-token-address.png)
+![API permissions](docs/aad-app-registration-005.png)
 
-Then under the "Body" tab select "Form URL Encoded" and configure it like the below screenshot:
+Then inside Insomnia, create a new request.
 
-![Form](docs/get-token-form.png)
+From the new request screen, select the down arrow next to the "Auth" tab. Inside that drop down list, select OAuth 2.0.
 
-> The code is from the url redirect from the get code screens in the browser.
->
-> The id, secret and redirect url are from the application registration.
+For the Grant Type, leave selected as "Authorization Code".
 
-Once you click "send" it should give you json output that has a bearer token in it to use to call the api.
+For the Authorization URL use, https://login.microsoftonline.com/[tenantId]/oauth2/v2.0/authorize where _tenantId_ is found under the Overview tab on the Azure Portal (labelled as Directory (tenant) ID).
+
+For the Access Token URL use, https://login.microsoftonline.com/[tenantId]/oauth2/v2.0/token where _tenantId_ is the same guid from above.
+
+For the "Client ID" use the Application (client) ID field from the Azure Portal.
+
+For the "Client Secret" we will need to create a new one in the Azure Portal (under the Certificates & secrets tab).
+
+For the "Redirect URL" we will enter the one from above.
+
+Under "Advanced Options" we will enter our scopes as: openid api://[clientId]/access_as_user where _clientId_ offline_access is from above.
+
+Under the "State" we can enter anything here, it will be essentially passed to your API service.
+
+The screen should look similar to:
+
+![Configuration](docs/insomnia-config.png)
+
+For more information, please see [my blog article](https://jwendl.net/2018/11/06/using-insomnia-to-test-aad-v2/)
+
+## Using Multiple Data Providers
+
+This solution supports Cosmos DB and Azure Table Storage depending on the scenario. 
+
+To enable Table Storage just enable the following in the local.settings.json file:
+``` json
+	"StorageConnectionString": "UseDevelopmentStorage=true",
+```
+
+To enable Cosmos DB just enable the following in the local.settings.json file:
+
+``` json
+	"DocumentEndpoint": "https://localhost:8081/",
+	"DocumentKey": "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==",
+	"DatabaseId": "PolicyManager",
+```

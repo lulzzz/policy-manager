@@ -13,29 +13,29 @@ using System.Threading.Tasks;
 
 namespace PolicyManager
 {
-    public static class AddPolicy
+    public static class AddUserPolicy
     {
-        [FunctionName(nameof(AddPolicy))]
+        [FunctionName(nameof(AddUserPolicy))]
         public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, ILogger log)
         {
-            log.LogInformation($"{nameof(AddPolicy)} Invoked");
+            log.LogInformation($"{nameof(AddUserPolicy)} Invoked");
 
             var claimsPrincipal = await AuthHelper.ValidateTokenAsync(req?.Headers?.Authorization, log);
             if (claimsPrincipal == null) return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             var userPrincipalName = claimsPrincipal.Identity.Name;
 
-            var policyRule = await req.Content.ReadAsAsync<PolicyRule>();
-            policyRule.RowKey = Guid.NewGuid().ToString();
-            policyRule.PartitionKey = policyRule.Category;
-            policyRule.CreatedBy = userPrincipalName;
-            policyRule.CreatedDate = DateTime.UtcNow;
-            policyRule.LastModifiedBy = userPrincipalName;
-            policyRule.ModifiedDate = DateTime.UtcNow;
+            var userPolicy = await req.Content.ReadAsAsync<UserPolicy>();
+            userPolicy.RowKey = Guid.NewGuid().ToString();
+            userPolicy.PartitionKey = userPrincipalName;
+            userPolicy.UserPrincipalName = userPrincipalName;
+            userPolicy.CreatedBy = userPrincipalName;
+            userPolicy.CreatedDate = DateTime.UtcNow;
+            userPolicy.LastModifiedBy = userPrincipalName;
+            userPolicy.ModifiedDate = DateTime.UtcNow;
 
-            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<PolicyRule>>();
-            var resultPolicyRule = await dataRepository.CreateItemAsync(policyRule);
-
-            return new OkObjectResult(resultPolicyRule);
+            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<UserPolicy>>();
+            var resultUserPolicy = await dataRepository.CreateItemAsync(userPolicy);
+            return new OkObjectResult(resultUserPolicy);
         }
     }
 }

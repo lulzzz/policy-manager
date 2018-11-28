@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using PolicyManager.DataAccess;
 using PolicyManager.DataAccess.Models;
 using PolicyManager.DataAccess.Repositories;
-using PolicyManager.Extensions;
 using PolicyManager.Helpers;
 using System;
 using System.Net;
@@ -23,17 +22,17 @@ namespace PolicyManager
 
             var claimsPrincipal = await AuthHelper.ValidateTokenAsync(req?.Headers?.Authorization, log);
             if (claimsPrincipal == null) return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
-            var userPrincipalName = claimsPrincipal.FetchPropertyValue("preferred_username");
+            var userPrincipalName = claimsPrincipal.Identity.Name;
 
             var policyRule = await req.Content.ReadAsAsync<PolicyRule>();
-            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<string, PolicyRule>>();
+            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<PolicyRule>>();
 
-            var dataPolicyRule = await dataRepository.FetchItemAsync(policyRule.Partition, policyRule.Id);
+            var dataPolicyRule = await dataRepository.ReadItemAsync(policyRule.PartitionKey, policyRule.RowKey);
             dataPolicyRule.LastModifiedBy = userPrincipalName;
             dataPolicyRule.ModifiedDate = DateTime.UtcNow;
             dataPolicyRule.Rule = policyRule.Rule;
 
-            var resultPolicyRule = await dataRepository.UpdateItemAsync(dataPolicyRule.Partition, dataPolicyRule.Id, dataPolicyRule);
+            var resultPolicyRule = await dataRepository.UpdateItemAsync(dataPolicyRule);
 
             return new OkObjectResult(resultPolicyRule);
         }

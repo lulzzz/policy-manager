@@ -3,10 +3,8 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using PolicyManager.DataAccess;
-using PolicyManager.DataAccess.Extensions;
 using PolicyManager.DataAccess.Models;
 using PolicyManager.DataAccess.Repositories;
-using PolicyManager.Extensions;
 using PolicyManager.Helpers;
 using System;
 using System.Net;
@@ -24,18 +22,16 @@ namespace PolicyManager
 
             var claimsPrincipal = await AuthHelper.ValidateTokenAsync(req?.Headers?.Authorization, log);
             if (claimsPrincipal == null) return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
-            var userPrincipalName = claimsPrincipal.FetchPropertyValue("preferred_username");
+            var userPrincipalName = claimsPrincipal.Identity.Name;
 
             var queryString = req.RequestUri.ParseQueryString();
-            var category = Convert.ToString(queryString["category"]);
             var id = Convert.ToString(queryString["id"]);
-            var partition = category.ToPolicyRulePartitionKey();
+            var partition = Convert.ToString(queryString["category"]);
 
-            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<string, PolicyRule>>();
+            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<PolicyRule>>();
+            var policyRule = await dataRepository.ReadItemAsync(partition, id);
 
-            var policyRules = await dataRepository.FetchItemAsync(partition, id);
-
-            return new OkObjectResult(policyRules);
+            return new OkObjectResult(policyRule);
         }
     }
 }

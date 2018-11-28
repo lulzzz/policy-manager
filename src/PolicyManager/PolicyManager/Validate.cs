@@ -3,7 +3,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using PolicyManager.DataAccess;
-using PolicyManager.DataAccess.Extensions;
 using PolicyManager.DataAccess.Models;
 using PolicyManager.DataAccess.Repositories;
 using PolicyManager.Extensions;
@@ -12,7 +11,6 @@ using PolicyManager.Lexer;
 using PolicyManager.Results;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -24,34 +22,26 @@ namespace PolicyManager
         [FunctionName("Validate")]
         public static async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, ILogger log)
         {
-            log.LogInformation("Validate Invoked.");
+            log.LogInformation($"{nameof(Validate)} Invoked");
 
             var claimsPrincipal = await AuthHelper.ValidateTokenAsync(req?.Headers?.Authorization, log);
             if (claimsPrincipal == null) return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
-            var userPrincipalName = claimsPrincipal.FetchPropertyValue("preferred_username");
+            var userPrincipalName = claimsPrincipal.Identity.Name;
             var userObjectId = claimsPrincipal.FetchPropertyValue("oid");
-            var partition = userPrincipalName.ToUserPolicyPartitionKey();
+            var partition = userPrincipalName;
 
             var queryString = req.RequestUri.ParseQueryString();
             var context = Convert.ToString(queryString["context"]);
 
-            var userPolicyRepository = ServiceLocator.GetRequiredService<IDataRepository<string, UserPolicy>>();
-            var policyRuleRepository = ServiceLocator.GetRequiredService<IDataRepository<string, PolicyRule>>();
-
-            var policyRulePartitions = await policyRuleRepository.FetchPartitionKeys();
-            var userPolicy = await userPolicyRepository.FindItemAsync(partition, up => up.UserObjectId == userObjectId);
-
-            var policyRules = new List<PolicyRule>();
-            foreach (var partitionItem in policyRulePartitions)
-            {
-                var results = await policyRuleRepository.FindItemsAsync(partitionItem.Partition, pr => userPolicy.PolicyIds.Contains(pr.Id));
-                policyRules.AddRange(results);
-            }
+            var policyRuleRepository = ServiceLocator.GetRequiredService<IDataRepository<PolicyRule>>();
+            var userPolicyRepository = ServiceLocator.GetRequiredService<IDataRepository<UserPolicy>>();
+            var userPolicies = await userPolicyRepository.ReadItemsAsync(partition);
 
             var validateResults = new List<ValidateResult>();
-            foreach (var policyRule in policyRules)
+            foreach (var userPolicy in userPolicies)
             {
-                var initialState = new Dictionary<string, string>
+                var policyRule = await policyRuleRepository.ReadItemAsync(userPolicy.PolicyCategory, userPolicy.PolicyId);
+                var initialState = new Dictionary<string, string>()
                 {
                     { "context", context },
                     { "userName", userPrincipalName }
@@ -59,7 +49,7 @@ namespace PolicyManager
 
                 var lexerProvider = new LexerProvider();
                 var returnValue = lexerProvider.RunLexer(initialState, policyRule.Rule);
-                validateResults.Add(new ValidateResult() { Id = policyRule.Id, Category = policyRule.Category, PolicyName = policyRule.DisplayName, Description = policyRule.Description, Result = returnValue.ToString() });
+                validateResults.Add(new ValidateResult() { Id = policyRule.RowKey, Category = policyRule.Category, PolicyName = policyRule.DisplayName, Description = policyRule.Description, Result = returnValue.ToString() });
             }
 
             return new OkObjectResult(validateResults);

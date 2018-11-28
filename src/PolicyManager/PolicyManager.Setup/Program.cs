@@ -9,11 +9,11 @@ namespace PolicyManager.Setup
     {
         public static async Task Main(string[] args)
         {
-            var policyRuleRepository = ServiceLocator.GetRequiredService<IDataRepository<string, PolicyRule>>();
-            await policyRuleRepository.InitializeDatabaseAsync("/partition");
+            var policyRuleRepository = ServiceLocator.GetRequiredService<IDataRepository<PolicyRule>>();
+            await policyRuleRepository.InitializeDatabaseAsync();
 
-            var userPolicyRepository = ServiceLocator.GetRequiredService<IDataRepository<string, UserPolicy>>();
-            await userPolicyRepository.InitializeDatabaseAsync("/partition");
+            var userPolicyRepository = ServiceLocator.GetRequiredService<IDataRepository<UserPolicy>>();
+            await userPolicyRepository.InitializeDatabaseAsync();
         }
     }
 }

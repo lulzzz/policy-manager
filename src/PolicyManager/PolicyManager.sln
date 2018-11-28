@@ -11,7 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolicyManager.DataAccess", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolicyManager.Lexer", "PolicyManager.Lexer\PolicyManager.Lexer.csproj", "{F5F74A0F-4698-4F1D-AA14-ED661F2416F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolicyManager.Lexer.Tests", "PolicyManager.Lexer.Tests\PolicyManager.Lexer.Tests.csproj", "{19BEC771-F246-4F94-9283-1B3AA0D553EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolicyManager.Lexer.Tests", "PolicyManager.Lexer.Tests\PolicyManager.Lexer.Tests.csproj", "{19BEC771-F246-4F94-9283-1B3AA0D553EA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6F4CA2CA-7ED6-47D2-9D61-E0D44ACED1F1}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\README.md = ..\..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

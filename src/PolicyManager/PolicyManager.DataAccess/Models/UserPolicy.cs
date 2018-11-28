@@ -1,42 +1,23 @@
-﻿using Newtonsoft.Json;
-using PolicyManager.DataAccess.Attributes;
-using PolicyManager.DataAccess.Extensions;
+﻿using Microsoft.WindowsAzure.Storage.Table;
 using System;
-using System.Collections.Generic;
 
 namespace PolicyManager.DataAccess.Models
 {
-    [DocumentName("UserPolicies")]
     public class UserPolicy
+        : TableEntity
     {
-        [JsonProperty("id")]
-        public string Id { get; set; }
+        public string PolicyId { get; set; }
 
-        [JsonProperty("partition")]
-        public string Partition
-        {
-            get { return UserPrincipalName.ToUserPolicyPartitionKey(); }
-        }
+        public string PolicyCategory { get; set; }
 
-        [JsonProperty("userPrincipalName")]
         public string UserPrincipalName { get; set; }
 
-        [JsonProperty("createdBy")]
         public string CreatedBy { get; set; }
 
-        [JsonProperty("createdDate")]
         public DateTime CreatedDate { get; set; }
 
-        [JsonProperty("lastModifiedBy")]
         public string LastModifiedBy { get; set; }
 
-        [JsonProperty("modifiedDate")]
         public DateTime ModifiedDate { get; set; }
-
-        [JsonProperty("userObjectId")]
-        public string UserObjectId { get; set; }
-
-        [JsonProperty("policyIds")]
-        public IEnumerable<string> PolicyIds { get; set; }
     }
 }

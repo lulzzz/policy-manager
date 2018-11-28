@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -13,24 +13,25 @@ using System.Threading.Tasks;
 
 namespace PolicyManager
 {
-    public static class FetchPolicies
+    public static class DeleteUserPolicy
     {
-        [FunctionName("FetchPolicies")]
-        public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, ILogger log)
+        [FunctionName(nameof(DeleteUserPolicy))]
+        public static async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, ILogger log)
         {
-            log.LogInformation("Fetch Policies Invoked.");
+            log.LogInformation($"{nameof(DeletePolicy)} Invoked");
 
             var claimsPrincipal = await AuthHelper.ValidateTokenAsync(req?.Headers?.Authorization, log);
             if (claimsPrincipal == null) return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             var userPrincipalName = claimsPrincipal.Identity.Name;
 
             var queryString = req.RequestUri.ParseQueryString();
-            var partition = Convert.ToString(queryString["category"]);
+            var id = Convert.ToString(queryString["id"]);
+            var partition = userPrincipalName;
 
-            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<PolicyRule>>();
-            var policyRules = await dataRepository.ReadItemsAsync(partition);
+            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<UserPolicy>>();
+            await dataRepository.DeleteItemAsync(partition, id);
 
-            return new OkObjectResult(policyRules);
+            return new OkResult();
         }
     }
 }

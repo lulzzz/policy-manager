@@ -30,7 +30,7 @@ POST <http://localhost:7071/api/AddPolicy>
 
 Update User Policies
 
-POST <http://localhost:7071/api/UpdateUserPolicies>
+POST <http://localhost:7071/api/AddUserPolicy>
 
 ``` json
 {

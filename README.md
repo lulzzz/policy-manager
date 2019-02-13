@@ -1,6 +1,6 @@
 # Policy Manager
 
-A policy manager using Azure Functions and Cosmos DB to manage contextual based resources using policies.
+A policy manager using Azure Functions and Table Storage to manage contextual based resources using policies.
 
 ## Getting Started
 

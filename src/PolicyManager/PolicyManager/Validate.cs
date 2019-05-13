@@ -27,7 +27,6 @@ namespace PolicyManager
             var claimsPrincipal = await AuthHelper.ValidateTokenAsync(req?.Headers?.Authorization, log);
             if (claimsPrincipal == null) return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
             var userPrincipalName = claimsPrincipal.Identity.Name;
-            var userObjectId = claimsPrincipal.FetchPropertyValue("oid");
             var partition = userPrincipalName;
 
             var queryString = req.RequestUri.ParseQueryString();

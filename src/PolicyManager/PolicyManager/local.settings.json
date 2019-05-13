@@ -5,7 +5,7 @@
     "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
     "StorageConnectionString": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "Audience": "api://7410374f-655a-4e98-97e2-443718523fa7",
-    "Issuer": "https://sts.windows.net/453b8921-be44-49ec-bd3c-87414db10cb2/"
+    "Audience": "api://8d4d0597-8f8d-41c3-b701-ddcf5413c6e1",
+    "Issuer": "https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/"
   }
 }

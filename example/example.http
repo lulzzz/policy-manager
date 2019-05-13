@@ -1,0 +1,36 @@
+@ApiToken = Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkhCeGw5bUFlNmd4YXZDa2NvT1UyVEhzRE5hMCIsImtpZCI6IkhCeGw5bUFlNmd4YXZDa2NvT1UyVEhzRE5hMCJ9.eyJhdWQiOiJhcGk6Ly84ZDRkMDU5Ny04ZjhkLTQxYzMtYjcwMS1kZGNmNTQxM2M2ZTEiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC83MmY5ODhiZi04NmYxLTQxYWYtOTFhYi0yZDdjZDAxMWRiNDcvIiwiaWF0IjoxNTU3NzgyMjY4LCJuYmYiOjE1NTc3ODIyNjgsImV4cCI6MTU1Nzc4NjE2OCwiYWNyIjoiMSIsImFpbyI6IkFWUUFxLzhMQUFBQXZCMXJhVkQwQWg3dFZvYVhwTCtDWnVvZXV1amNKbGRmN1gyS2NpQzJ6NnM3YjhYKzdHb1pqclZ1K096Z0RZbmt1R3dvUmN2MDdWb2ZHQmk4ODlpYVFGVEZNN0JsOVZkSGJ4c1BJSnRpdTNRPSIsImFtciI6WyJ3aWEiLCJtZmEiXSwiYXBwaWQiOiI4ZDRkMDU5Ny04ZjhkLTQxYzMtYjcwMS1kZGNmNTQxM2M2ZTEiLCJhcHBpZGFjciI6IjEiLCJmYW1pbHlfbmFtZSI6IldlbmRsYW5kdCIsImdpdmVuX25hbWUiOiJKdXN0aW4iLCJpcGFkZHIiOiIxMzEuMTA3LjE3NC4yMDEiLCJuYW1lIjoiSnVzdGluIFdlbmRsYW5kdCIsIm9pZCI6IjI2MDliY2Y3LTQ3NWYtNDljMC04MDQwLTg1ZTY2N2I0ZjNhYSIsIm9ucHJlbV9zaWQiOiJTLTEtNS0yMS0xMjQ1MjUwOTUtNzA4MjU5NjM3LTE1NDMxMTkwMjEtMTQ5OTI4MiIsInNjcCI6IlBvbGljeS5SZWFkLkFsbCIsInN1YiI6Ik9mbGFxNnZfaEd4emk5RlAxaUI5VHZSaTNBSDVLWUdkV0JjTnY2N29WMGciLCJ0aWQiOiI3MmY5ODhiZi04NmYxLTQxYWYtOTFhYi0yZDdjZDAxMWRiNDciLCJ1bmlxdWVfbmFtZSI6Imp1c3dlbkBtaWNyb3NvZnQuY29tIiwidXBuIjoianVzd2VuQG1pY3Jvc29mdC5jb20iLCJ1dGkiOiJtTW5XLVpYUjlVMkJsSWE1b3kwRUFBIiwidmVyIjoiMS4wIn0.Rc73KTWWUqRzoLVF8Gg2oPNBLPUvjy3mzFexJqE1gPbJwADOman_BbyMtSGI_EhnbZpFcgV8ipz5OXC0AsylWBmd2zAwEk51t6Tz3gBVSdiwpQdKF8Nlp6N16BO5L039dZrkK35qfIPPF-YSRtl42Y9kWLm1atcPdLcefL14x022saHIKnXO5rgNd0Ty6irpDhRdTW2eai9CsXuiiATPVE2JvjfBljhqR4A_827tiF3P0JVhGLhUaqop4E4lJOZAnu4AF6Dzuqx4ezodb-3pXbhZZ1E_66LXfMbh3LVo3ISi9ZlEOtUGxmKrh5dDMZktwHUKkVKnTUum9n4QtmhZDg
+
+## Add policy
+POST http://localhost:7071/api/AddPolicy
+Content-Type: application/json
+Authorization: {{ApiToken}}
+
+{
+	"category": "Finance",
+	"displayName": "Test Policy 01",
+	"description": "This is a test policy rule",
+	"rule": "if (userName == \"juswen@microsoft.com\") { return \"allow\"; } else { return \"deny\"; }"
+}
+###
+@policyId = f5f22984-d3b1-402a-bbe3-23e686f95a50
+
+## Fetch policies
+GET http://localhost:7071/api/FetchPolicies?category=Finance
+Authorization: {{ApiToken}}
+###
+
+## Update user policy
+POST http://localhost:7071/api/AddUserPolicy
+Content-Type: application/json
+Authorization: {{ApiToken}}
+
+{
+	"policyId": "{{policyId}}",
+	"policyCategory": "Finance"
+}
+###
+
+## Validate
+GET http://localhost:7071/api/Validate?context=/user/profile
+Authorization: {{ApiToken}}
+###

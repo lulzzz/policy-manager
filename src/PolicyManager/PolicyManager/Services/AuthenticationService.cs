@@ -9,16 +9,24 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PolicyManager.Helpers
+namespace PolicyManager.Services
 {
-    public static class AuthHelper
+    public interface IAuthenticationService
     {
-        private static readonly IConfigurationManager<OpenIdConnectConfiguration> configurationManager;
+        Task<ClaimsPrincipal> ValidateTokenAsync(AuthenticationHeaderValue authenticationHeaderValue);
+    }
 
-        static AuthHelper()
+    public class AuthenticationService
+        : IAuthenticationService
+    {
+        private readonly IConfigurationManager<OpenIdConnectConfiguration> configurationManager;
+        private readonly ILogger logger;
+
+        public AuthenticationService(ILoggerFactory loggerFactory)
         {
-            var issuer = Environment.GetEnvironmentVariable("Issuer");
+            logger = loggerFactory.CreateLogger<AuthenticationService>();
 
+            var issuer = Environment.GetEnvironmentVariable("Issuer");
             var documentRetriever = new HttpDocumentRetriever
             {
                 RequireHttps = issuer.StartsWith("https://")
@@ -31,7 +39,7 @@ namespace PolicyManager.Helpers
             );
         }
 
-        public static async Task<ClaimsPrincipal> ValidateTokenAsync(AuthenticationHeaderValue authenticationHeaderValue, ILogger log)
+        public async Task<ClaimsPrincipal> ValidateTokenAsync(AuthenticationHeaderValue authenticationHeaderValue)
         {
             if (authenticationHeaderValue?.Scheme != "Bearer")
             {
@@ -74,8 +82,8 @@ namespace PolicyManager.Helpers
                 }
                 catch (SecurityTokenException ex)
                 {
-                    log.LogError(ex.Message);
-                    return null;
+                    logger.LogError(ex.Message);
+                    return result;
                 }
             }
 

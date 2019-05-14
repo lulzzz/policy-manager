@@ -2,10 +2,9 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using PolicyManager.DataAccess;
 using PolicyManager.DataAccess.Models;
 using PolicyManager.DataAccess.Repositories;
-using PolicyManager.Helpers;
+using PolicyManager.Services;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -13,23 +12,30 @@ using System.Threading.Tasks;
 
 namespace PolicyManager
 {
-    public static class DeleteUserPolicy
+    public class DeleteUserPolicy
     {
+        private readonly IAuthenticationService authenticationService;
+        private readonly IDataRepository<UserPolicy> userPolicyRepository;
+
+        public DeleteUserPolicy(IAuthenticationService authenticationService, IDataRepository<UserPolicy> userPolicyRepository)
+        {
+            this.authenticationService = authenticationService;
+            this.userPolicyRepository = userPolicyRepository;
+        }
+
         [FunctionName(nameof(DeleteUserPolicy))]
-        public static async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, ILogger log)
+        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, ILogger log)
         {
             log.LogInformation($"{nameof(DeletePolicy)} Invoked");
 
-            var claimsPrincipal = await AuthHelper.ValidateTokenAsync(req?.Headers?.Authorization, log);
-            if (claimsPrincipal == null) return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
-            var userPrincipalName = claimsPrincipal.Identity.Name;
+            var claimsPrincipal = await authenticationService.ValidateTokenAsync(req?.Headers.Authorization);
+            if (claimsPrincipal == null) return new UnauthorizedResult();
 
             var queryString = req.RequestUri.ParseQueryString();
             var id = Convert.ToString(queryString["id"]);
-            var partition = userPrincipalName;
+            var partition = claimsPrincipal.Identity.Name;
 
-            var dataRepository = ServiceLocator.GetRequiredService<IDataRepository<UserPolicy>>();
-            await dataRepository.DeleteItemAsync(partition, id);
+            await userPolicyRepository.DeleteItemAsync(partition, id);
 
             return new OkResult();
         }

@@ -6,17 +6,20 @@ PBAC (policy based access control) combines attributes from resource (context), 
 
 ### Example Use Case
 
+```
 Entity Types
 UserTypes: Admin, User, Guest
 Roles: Application Administrator, Contributor, Reader
 Groups: Administrators, Finance, Human Resources, Users, Guests
 Entitlements: User.Read.All, Orders.Read.Group, Orders.Read.All
 Permissions: ReadOrders, UpdateOrders, ReadGroups, UpdateGroups, ReadUsers, UpdateUsers, ReadCustomers, UpdateCustomers
+```
 
 Permissions can be related to either: Users, Roles, Groups or Entitlements
 
 User = JaneDoe, UserType = User, Roles = [Contributor], Groups = [Human Resources, Users], Entitlements = [User.Read.All], InheritedPermissions = [ReadUsers, ReadGroups]
 
+```
 Policy to test based on a context of /orders/1
 Title: Can read orders
 Context: /orders
@@ -25,6 +28,7 @@ Roles: [Contributor, Reader]
 Groups: [Administrators, Finance]
 Entitlements: [Orders.Read.Group, Orders.Read.All]
 Permissions: [ReadOrders, UpdateOrders]
+```
 
 In this case JaneDoe would return "Deny" because Jane isn't using an application with the entitlement of Orders.Read.Group or Orders.Read.All and Jane's inherited permissions does not contain ReadOrders
 

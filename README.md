@@ -6,8 +6,9 @@ PBAC (policy based access control) combines attributes from resource (context), 
 
 ### Example Use Case
 
-```
 Entity Types
+
+```
 UserTypes: Admin, User, Guest
 Roles: Application Administrator, Contributor, Reader
 Groups: Administrators, Finance, Human Resources, Users, Guests
@@ -19,8 +20,9 @@ Permissions can be related to either: Users, Roles, Groups or Entitlements
 
 User = JaneDoe, UserType = User, Roles = [Contributor], Groups = [Human Resources, Users], Entitlements = [User.Read.All], InheritedPermissions = [ReadUsers, ReadGroups]
 
-```
 Policy to test based on a context of /orders/1
+
+```
 Title: Can read orders
 Context: /orders
 UserTypes: [Admin, User, Guest]

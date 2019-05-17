@@ -7,12 +7,11 @@
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.4.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="5.4.0" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.27" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.28" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.4.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PolicyManager.DataAccess\PolicyManager.DataAccess.csproj" />
-    <ProjectReference Include="..\PolicyManager.Lexer\PolicyManager.Lexer.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

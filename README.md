@@ -4,36 +4,6 @@ A policy manager using Azure Functions and Table Storage to manage contextual ba
 
 PBAC (policy based access control) combines attributes from resource (context), environment and the requestor (online claims principal).
 
-### Example Use Case
-
-Entity Types
-
-```
-UserTypes: Admin, User, Guest
-Roles: Application Administrator, Contributor, Reader
-Groups: Administrators, Finance, Human Resources, Users, Guests
-Entitlements: User.Read.All, Orders.Read.Group, Orders.Read.All
-Permissions: ReadOrders, UpdateOrders, ReadGroups, UpdateGroups, ReadUsers, UpdateUsers, ReadCustomers, UpdateCustomers
-```
-
-Permissions can be related to either: Users, Roles, Groups or Entitlements
-
-User = JaneDoe, UserType = User, Roles = [Contributor], Groups = [Human Resources, Users], Entitlements = [User.Read.All], InheritedPermissions = [ReadUsers, ReadGroups]
-
-Policy to test based on a context of /orders/1
-
-```
-Title: Can read orders
-Context: /orders
-UserTypes: [Admin, User, Guest]
-Roles: [Contributor, Reader]
-Groups: [Administrators, Finance]
-Entitlements: [Orders.Read.Group, Orders.Read.All]
-Permissions: [ReadOrders, UpdateOrders]
-```
-
-In this case JaneDoe would return "Deny" because Jane isn't using an application with the entitlement of Orders.Read.Group or Orders.Read.All and Jane's inherited permissions does not contain ReadOrders
-
 ## Getting Started
 
 1. Clone the repository
@@ -42,6 +12,14 @@ In this case JaneDoe would return "Deny" because Jane isn't using an application
 4. Run the application
 5. Set the PolicyManager project as the startup project
 6. Hit F5 and see the section below labelled "Example Api Usage"
+
+## Data Model
+
+* Policy
+	* Resource: A resource that is a specific item, or a top level item to attach metadata to, ie; /locations/1/devices
+	* Attributes: Tags for particular resources, ie; fire-panel
+	* Target: The target object type, ie; Device
+	* Actions: The permissions being asked for, ie; Read, Update
 
 ## Example Api Usage
 

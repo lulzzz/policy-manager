@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Flee" Version="1.2.2" />
     <PackageReference Include="Microsoft.Azure.DocumentDB.Core" Version="2.4.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0-preview5.19227.9" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.0.0-preview5.19227.9" />
@@ -12,10 +13,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0-preview5.19227.9" />
     <PackageReference Include="Microsoft.Graph" Version="1.15.0" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
 </Project>
